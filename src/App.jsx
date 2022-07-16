@@ -24,7 +24,9 @@ function App() {
   const [provider, setProvider] = useState();
   const [voting, setVoting] = useState();
   const [workflow, setWorkflow] = useState();
-  const currentStatus =["Registering voters", "Submiting proposals", "Proposals submission ended", "Voting session started", "voting session ended", "Votes have been tallied"];
+  const [display, setDisplay] = useState(false);
+  const currentStatus = ["Registering voters", "Submiting proposals", "Proposals submission ended", "Voting session started", "voting session ended", "Votes have been tallied"];
+  
 
 
   useEffect(() => {
@@ -66,12 +68,21 @@ function App() {
     (async function () {
       if (voting) {
         setAdmin(getAddress(await voting.owner()));
-        setWorkflow(0);
-        }
+
+      }
     })();
   }, [voting]);
 
- 
+  useEffect(() => {
+    (async function () {
+      if (voting) {
+        let i = await voting.workflowStatus();
+
+        setWorkflow(BigNumber.from(i).toNumber());
+      }
+    })();
+  }, [voting]);
+
 
 
 
@@ -89,26 +100,47 @@ function App() {
       currentStatus,
       propsArray,
       setPropsArray,
-    }}>
-      <UserDashboard />
+      display, setDisplay
+      }}>
       <AdminDashboard />
-    </UserContext.Provider>
+      <UserDashboard />
+      </UserContext.Provider>
   );
 }
 
 function UserDashboard() {
   const {
-    user, chainId, voting, workflow, currentStatus, propsArray, setPropsArray
+    user, chainId, voting, workflow, currentStatus, propsArray, setPropsArray, display, setDisplay
   } = useContext(UserContext);
+  
 
   async function handleProposal() {
     if (voting) {
       try {
         await voting.addProposal(document.getElementById('someoneSaid').value);
-        voting.on("ProposalRegistered", (proposalId) => {
-          setPropsArray((arr) => { return [...arr, { proposalId }] });
-          console.log(propsArray[0]);
-        })
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }
+
+
+
+
+
+  async function showProposal() {
+    if (voting) {
+      try {
+        
+        let listProposals = await voting.queryFilter(voting.filters.ProposalRegistered());
+        for (let i = 0; i < listProposals.length; i++) {
+          let prop = await voting.getOneProposal(i);
+          let propdesc = prop.description;
+          setPropsArray((propsArray) => [...propsArray, [[i, propdesc]]]);
+        }
+
+
+
 
       } catch (e) {
         console.error(e);
@@ -116,28 +148,66 @@ function UserDashboard() {
     }
   }
 
+  const handleClick = () => {
+
+    if (!display) {
+    showProposal();
+    setDisplay(true);
+    
+    } else {
+      
+      setPropsArray([]);
+      setDisplay(false);
+      
+    }
+    
+  };
+
   return (
-    <>
-      
-      <p>Current status is : {currentStatus[workflow]}</p> {user ? `Currently connected address is ${user}` : 'no wallet...'}
-      
-      {chainId && chainId !== '0x3' && (
-        <p>Vous êtes connecté à {chainId}, connectez vous à Ropsten</p>
-      )}
-      <p>Current status is : {currentStatus[workflow]}</p>
-      {user && workflow === 0 && (<>
-      <p>Proposals submission haven't started yet</p>
+
+
+
+    <div><hr />{user && (<div></div>)}
+      {!user && (<><p>Metamask isn't connected</p></>)}
+      {user && (<div><p>Current status is : {currentStatus[workflow]}</p>
+
+        {chainId && chainId !== '0x3' && (
+          <p>Vous êtes connecté à {chainId}, connectez vous à Ropsten</p>
+        )}
+
+        {user && workflow === 0 && (<>
+          <p>Proposals submission haven't started yet</p>   
         </>
-      )}
-      {user && workflow === 1 && (<>
-      <p>Tell us in your own words, what would be best !</p><input type='text' placeholder='Your brilliant idea goes here' id='someoneSaid' /><button onClick={handleProposal}>Submit!</button>
+        )}
+        {user && workflow === 1 && (<>
+          <p>Tell us in your own words, what would be best !</p><input type='text' placeholder='Your brilliant idea goes here' id='someoneSaid' /><button onClick={handleProposal}>Submit!</button> 
+          {user && workflow >=1 && workflow <= 5 && (<>{!display ? <button onClick={handleClick}>Show Proposals</button> : <button onClick={handleClick}>Hide Proposals</button>}</>)}
+          {display ? 
+            <><hr /><table>
+            <thead>
+                <tr>
+                    <th>Submitted proposals</th>
+                </tr>
+            </thead>
+            <tbody>
+            {propsArray.map((prop) => (
+                <tr key={prop[0]}>
+                    <td key={prop[1]}>{prop[0]}</td>
+                    
+                </tr>
+            ))}
+            </tbody>
+        </table></> : <></>}
+          
         </>
-      )}
-      {user && workflow >= 2 && (<>
-      <p>Proposals submission is now closed</p>
+        )}
+        {user && workflow === 2 && (<>
+          <p>Proposals submission is now closed, waiting for admin to start voting session</p>
         </>
-      )}
-    </>
+        )}</div>)}
+    </div>
+
+
   );
 }
 
@@ -146,7 +216,7 @@ function AdminDashboard() {
     user, admin, voting, voterLog, setVoterLog, workflow, setWorkflow
   } = useContext(UserContext);
 
-  
+
   async function registerVoter() {
 
     if (voting) {
@@ -168,48 +238,48 @@ function AdminDashboard() {
     if (voting) {
       try {
         let tx;
-      switch(workflow) {
-      case 0 : tx = await voting.startProposalsRegistering();
-      break;
-      case 1 : tx = await voting.endProposalsRegistering();
-      break;
-      case 2 : tx = await voting.startVotingSession();
-      break;
-      case 3 : tx = await voting.endVotingSession();
-      break;
-      case 4 : tx = await voting.tallyVotes();
-      break;
-      default : alert("something went wrong");
-    }
+        switch (workflow) {
+          case 0: tx = await voting.startProposalsRegistering();
+            break;
+          case 1: tx = await voting.endProposalsRegistering();
+            break;
+          case 2: tx = await voting.startVotingSession();
+            break;
+          case 3: tx = await voting.endVotingSession();
+            break;
+          case 4: tx = await voting.tallyVotes();
+            break;
+          default: alert("something went wrong");
+        }
 
-    const receipt = await tx.wait();
-      console.log(receipt);
-      
-      await voting.on("WorkflowStatusChange", (previsousStatus, newStatus, event) => {
-        const i = BigNumber.from(newStatus).toNumber();
-        setWorkflow(i);
-        
-        
-      }) 
-      
+        const receipt = await tx.wait();
+        console.log(receipt);
+
+        await voting.on("WorkflowStatusChange", (previsousStatus, newStatus, event) => {
+          const i = BigNumber.from(newStatus).toNumber();
+          setWorkflow(i);
+
+
+        })
+
       } catch (e) {
         console.error(e);
       }
     }
 
-    
+
 
   };
 
   return (
     <div>
       {user && user === admin && (
-        
+
         <div>
-          <hr />
+          
           <h2>Admin Panel</h2>{workflow < 5 && (<><button onClick={handleWorkflow}>Next step</button></>)}
           <br />
-          <input type='text' placeholder='Type address here' id='voterAddress'></input>
+          {workflow === 0 && (<><input type='text' placeholder='Type address here' id='voterAddress'></input>
           <button onClick={registerVoter}>
             Add voter
           </button>
@@ -221,7 +291,7 @@ function AdminDashboard() {
               </li>
             ))}
 
-          </ul>
+          </ul></>)}
         </div>
       )}
     </div>
