@@ -1,1 +1,66 @@
-{"kind":"dev","methods":{"addProposal(string)":{"details":"proposalsArray length is limited at 500 to prevent a DoS from gas limit","params":{"_desc":"the description of the proposal submitted "}},"addVoter(address)":{"params":{"_addr":"The public key you want to add to whitelist"}},"getOneProposal(uint256)":{"details":"returns a proposal Struct from proposalsArray","params":{"_idProposal":"The index of the proposal you want"}},"getVoter(address)":{"details":"returns a voter Struct from the voters mapping","params":{"_addr":"The address of the voter you want to check "}},"owner()":{"details":"Returns the address of the current owner."},"renounceOwnership()":{"details":"Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."},"setVote(uint256)":{"params":{"_id":"The index of the proposal in proposalsArray"}},"startProposalsRegistering()":{"details":"Next four functions could be mixed in one to manage workflowStatus"},"tallyVotes()":{"details":"Finds the proposal with the highest vote count and assigns it to winningProposalID"},"transferOwnership(address)":{"details":"Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."}},"title":"Our Voting smart contract","version":1}
+{
+  "kind": "dev",
+  "methods":
+  {
+    "addProposal(string)":
+    {
+      "details": "proposalsArray length is limited at 500 to prevent a DoS from gas limit",
+      "params":
+      {
+        "_desc": "the description of the proposal submitted "
+      }
+    },
+    "addVoter(address)":
+    {
+      "params":
+      {
+        "_addr": "The public key you want to add to whitelist"
+      }
+    },
+    "getOneProposal(uint256)":
+    {
+      "details": "returns a proposal Struct from proposalsArray",
+      "params":
+      {
+        "_idProposal": "The index of the proposal you want"
+      }
+    },
+    "getVoter(address)":
+    {
+      "details": "returns a voter Struct from the voters mapping",
+      "params":
+      {
+        "_addr": "The address of the voter you want to check "
+      }
+    },
+    "owner()":
+    {
+      "details": "Returns the address of the current owner."
+    },
+    "renounceOwnership()":
+    {
+      "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+    },
+    "setVote(uint256)":
+    {
+      "params":
+      {
+        "_id": "The index of the proposal in proposalsArray"
+      }
+    },
+    "startProposalsRegistering()":
+    {
+      "details": "Next four functions could be mixed in one to manage workflowStatus"
+    },
+    "tallyVotes()":
+    {
+      "details": "Finds the proposal with the highest vote count and assigns it to winningProposalID"
+    },
+    "transferOwnership(address)":
+    {
+      "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+    }
+  },
+  "title": "Our Voting smart contract",
+  "version": 1
+}

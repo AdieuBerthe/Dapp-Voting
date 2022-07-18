@@ -1,1 +1,5 @@
-{"kind":"user","methods":{},"version":1}
+{
+  "kind": "user",
+  "methods": {},
+  "version": 1
+}

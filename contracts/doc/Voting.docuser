@@ -1,1 +1,16 @@
-{"kind":"user","methods":{"startProposalsRegistering()":{"notice":"Can't go back to a previous state"},"tallyVotes()":{"notice":"Doesn't handle equality"}},"notice":"this version is for a single vote session and doesn't handle equality","version":1}
+{
+  "kind": "user",
+  "methods":
+  {
+    "startProposalsRegistering()":
+    {
+      "notice": "Can't go back to a previous state"
+    },
+    "tallyVotes()":
+    {
+      "notice": "Doesn't handle equality"
+    }
+  },
+  "notice": "this version is for a single vote session and doesn't handle equality",
+  "version": 1
+}
