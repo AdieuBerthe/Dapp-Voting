@@ -33,18 +33,6 @@ async function main() {
       }
       console.log("JSON data is saved.");
   });
-
-  const currentPath = path.join(__dirname, "./", "address.json");
-const destinationPath = path.join(__dirname, "../src/artifacts/", "address.json");
-
-/*fs.rename(currentPath, destinationPath, function (err) {
-    if (err) {
-        throw err
-    } else {
-        console.log("Successfully moved the file!");
-    }
-});*/
-    
 }
 
 // We recommend this pattern to be able to use async/await everywhere

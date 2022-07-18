@@ -29,6 +29,7 @@ const UserContextProvider = ({ children }) => {
   const [votersWhoVoted, setVotersWhoVoted] = useState([]);
   const [winningId, setWinning] = useState();
   const [winningProp, setWinningProp] = useState("");
+  const [displayWinner, setDisplayWinner] = useState(false);
   const currentStatus = ["Registering voters", "Submiting proposals", "Proposals submission ended", "Voting session started", "voting session ended", "Votes have been tallied"];
   
 
@@ -118,8 +119,9 @@ const UserContextProvider = ({ children }) => {
             listVoters,
             setVotersList,
             displayVoters, 
-            setDisplayVoters
-            
+            setDisplayVoters,
+            displayWinner,
+            setDisplayWinner
             }}>
           {children}
         </UserContext.Provider>

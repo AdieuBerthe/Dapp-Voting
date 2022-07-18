@@ -1,12 +1,13 @@
 import { BigNumber } from 'ethers'
 import {useContext} from 'react';
 import { UserContext } from "./UserContextProvider";
+import './styles/AdminDashboard.css';
 
 function AdminDashboard() {
     const {
       user, admin, voting, workflow, setWorkflow, setWinning, listVoters, setVotersList, displayVoters, setDisplayVoters
     } = useContext(UserContext);
-  
+  const wfsDisplay = ["Start proposals subimission", "End proposals submission", "Start voting Session", "End voting session", "Tally votes"];
   
     async function registerVoter() {
   
@@ -93,23 +94,20 @@ function AdminDashboard() {
     };
   
     return (
-      <div>
+      <div >
+        
         {user && user === admin && (
   
-          <div>
+          <div className='global-admin'>
             
-            <h2>Admin Panel</h2>{workflow < 5 && (<><button className='button-81' onClick={handleWorkflow}>Next step</button></>)}
+            <h2 className='whitetext'>Admin Panel</h2>{workflow < 5 && (<div className='toright'><button className='button' onClick={handleWorkflow}>{wfsDisplay[workflow]}</button></div>)}
             <br />
-            {workflow === 0 && (<><input type='text' placeholder='Type address here' id='voterAddress'></input>
-            <button onClick={registerVoter}>
-              Add voter
-            </button>
-  
+            {workflow === 0 && (<><input className='input' type='text' placeholder='Type address here' id='voterAddress'></input>
+            <button className='button-submit' onClick={registerVoter}>Add voter</button>
             </>)}
-            {user && workflow <= 3 && (<>{!displayVoters ? <button onClick={toggleVoterDisplay}>Show registered voters</button> : <button onClick={toggleVoterDisplay}>Hide registered voters</button>}</>)}
-            
+            {user && workflow <= 3 && (<div className='globaladmin'><br/>{!displayVoters ? <button className='button' onClick={toggleVoterDisplay}>Show registered voters</button> : <button className='button' onClick={toggleVoterDisplay}>Hide registered voters</button>}</div>)}
             {displayVoters && workflow <=3 ? 
-              <><hr /><table>
+              <div className='voters'><table className='whitetext'>
               <thead>
                   <tr>
                       <th>Registered Voters</th>
@@ -122,9 +120,10 @@ function AdminDashboard() {
                   </tr>
               ))}
               </tbody>
-          </table></> : <></>}
+          </table></div> : <div className='global-admin'></div>}
           </div>
         )}
+        
       </div>
     );
   }
