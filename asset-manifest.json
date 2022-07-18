@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/Dapp-Voting/static/css/main.6dc28b94.css",
+    "main.js": "/Dapp-Voting/static/js/main.1eff9422.js",
+    "static/js/787.03770da1.chunk.js": "/Dapp-Voting/static/js/787.03770da1.chunk.js",
+    "index.html": "/Dapp-Voting/index.html",
+    "main.6dc28b94.css.map": "/Dapp-Voting/static/css/main.6dc28b94.css.map",
+    "main.1eff9422.js.map": "/Dapp-Voting/static/js/main.1eff9422.js.map",
+    "787.03770da1.chunk.js.map": "/Dapp-Voting/static/js/787.03770da1.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.6dc28b94.css",
+    "static/js/main.1eff9422.js"
+  ]
+}
