@@ -4,7 +4,7 @@ import './styles/UserDashboard.css';
 
 function UserDashboard() {
   const {
-    user, voting, workflow, currentStatus, propsArray, setPropsArray, display, setDisplay, id, setId, setVotersWhoVoted, votersWhoVoted, winningProp, winningId, setWinningProp, displayWinner, setDisplayWinner
+    user, voting, workflow, currentStatus, propsArray, setPropsArray, display, setDisplay, id, setId, setVotersWhoVoted, votersWhoVoted, winningProp, winningId, setWinningProp, displayWinner, setDisplayWinner, votedFor, setVotedFor
   } = useContext(UserContext);
 
 
@@ -41,19 +41,36 @@ function UserDashboard() {
   async function checkHasVoted() {
     if (voting) {
       try {
-
         let listVotersWhoVoted = await voting.queryFilter(voting.filters.Voted());
         for (let i = 0; i < listVotersWhoVoted.length; i++) {
           let voterAddress = listVotersWhoVoted[i].args[0];
           setVotersWhoVoted((Array) => [...Array, ...[voterAddress]]);
         }
       }
-
       catch (e) {
         console.error(e);
       }
-
     }
+  }
+
+  async function getVote() {
+    let address = document.getElementById('someAddress').value;
+    if (address.length === 42) {
+      try {
+        let Voter = await voting.getVoter(address);
+          if (Voter[1]) {
+            let prop = await voting.getOneProposal(Voter[2]);
+            setVotedFor(prop[0]);
+        } else {
+          alert("This one didn't vote or wasn't registered at all ! :(");
+        }
+      }
+      catch (e) {
+        console.error(e);
+      }
+    } else { 
+      alert("This doesn't match an address length");
+    };
   }
 
   async function getWinningProp() {
@@ -167,11 +184,11 @@ function UserDashboard() {
           }
         </>)}
 
-        {user && workflow === 4 && (<><p>Voting session has ended, waiting for admin to tally votes</p></>)}
+        {user && workflow === 4 && (<><p>Voting session has ended, waiting for admin to tally votes</p><p> You want to retrieve your friend's vote ? </p><input className='input' type='text' placeholder='type the address here, you spy' id='someAddress' /><button className='button-submit' onClick={getVote}>Show it</button><p>{votedFor}</p></>)}
 
         {user && workflow === 5 && (displayWinner ? <h3>Winning proposal is {winningProp}</h3> : <button className='button-user' onClick={getWinningProp}>Reveal the winning proposal</button>)}
 
-        {user && workflow < 3 && workflow >= 1 && (<><br/>{!display ? <button className='button-user skew-c' onClick={handleClick}>Show Proposals</button> : <button className='button-user' onClick={handleClick}>Hide Proposals</button>}</>)}
+        {user && workflow < 3 && workflow >= 1 && (<><br/>{!display ? <button className='button-user' onClick={handleClick}>Show Proposals</button> : <button className='button-user' onClick={handleClick}>Hide Proposals</button>}</>)}
         </>
     </div>
    
