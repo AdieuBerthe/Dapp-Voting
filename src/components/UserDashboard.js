@@ -77,10 +77,12 @@ function UserDashboard() {
     if (voting) {
       try {
         if(!displayWinner) {
+        setWinningProp('');
         let prop = await voting.getOneProposal(winningId);
+        
         let propdesc = prop.description;
         setWinningProp(propdesc);
-        setDisplayWinner(true);
+        showWinner();
         } 
       } catch (e) {
         console.error(e);
@@ -88,14 +90,17 @@ function UserDashboard() {
     }
   }
 
-  const handleClick = () => {
+  const showWinner = () => {
+    setDisplayWinner(true);
+  }
 
+  const handleClick = () => {
+      setPropsArray([]);
     if (!display) {
       checkHasVoted();
       showProposal();
       setDisplay(true);
     } else {
-      setPropsArray([]);
       setDisplay(false);
      }
   };

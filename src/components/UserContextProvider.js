@@ -72,6 +72,15 @@ const UserContextProvider = ({ children }) => {
   useEffect(() => {
     (async function () {
       if (voting) {
+        setWinning(await voting.winningProposalID());
+      }
+    })();
+    // eslint-disable-next-line
+  }, [workflow]);
+
+  useEffect(() => {
+    (async function () {
+      if (voting) {
         setAdmin(getAddress(await voting.owner()));
 
       }
