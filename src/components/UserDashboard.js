@@ -4,10 +4,11 @@ import './styles/UserDashboard.css';
 
 function UserDashboard() {
   const {
-    user, voting, workflow, currentStatus, propsArray, setPropsArray, display, setDisplay, id, setId, setVotersWhoVoted, votersWhoVoted, winningProp, winningId, setWinningProp, displayWinner, setDisplayWinner, votedFor, setVotedFor, 
+    user, voting, workflow, currentStatus, propsArray, setPropsArray, display, setDisplay, id, setId, setVotersWhoVoted, votersWhoVoted, winningProp, winningId, setWinningProp, displayWinner, setDisplayWinner, votedFor, setVotedFor, admin
   } = useContext(UserContext);  
 
    const [disabled, setDisabled] = useState(false);
+   const [isUserRegistered, setUserRegistered] = useState(false);
 
   
    useEffect(() => {
@@ -25,6 +26,20 @@ function UserDashboard() {
     })();
     // eslint-disable-next-line
   }, [voting, workflow]);
+
+  useEffect(() => {
+    (async function () {
+      if (voting) {
+        let userRegistered = await voting.getVoter(user);
+        if(userRegistered[1]) {
+          setUserRegistered(true);
+        }
+      }
+    })();
+    // eslint-disable-next-line
+  }, [voting, workflow, user]);
+
+  
 
 
   async function handleProposal() {
@@ -137,14 +152,11 @@ function UserDashboard() {
     {!user && (<><p>Metamask isn't connected</p></>)}
     <div className='element'><p>Connected account :<br /> {user}</p><p>Current status : {currentStatus[workflow]}</p></div>
       <h1>Voting Dapp</h1>
-     
-      
-      
-          
+
+    {!isUserRegistered && user === admin && (<h3>Don't forget to register your own address</h3>)}
+    {!isUserRegistered && user !== admin && (<p>Sorry you're not registered</p>)}
+    {isUserRegistered && (
       <>
-
-      
-
 
         {user && workflow === 0 && (<>
           <p>Proposals submission haven't started yet</p>
@@ -162,7 +174,7 @@ function UserDashboard() {
         </>
         )}
 
-{user && workflow < 3 && workflow >= 1 && (<><br/>{!display ? <button className='button-user' onClick={handleClick}>Show Proposals</button> : <button className='button-user' onClick={handleClick}>Hide Proposals</button>}</>)}
+          {user && workflow < 3 && workflow >= 1 && (<><br/>{!display ? <button className='button-user' onClick={handleClick}>Show Proposals</button> : <button className='button-user' onClick={handleClick}>Hide Proposals</button>}</>)}
 
           {display && workflow < 3 ?
             <div><table className='right'>
@@ -196,17 +208,14 @@ function UserDashboard() {
               </select>
               <input className='button-submit' disabled={disabled} type="submit" value="Confirm" />
             </form>
-}
+              }
         </>)}
 
         {user && workflow === 4 && (<><p>Voting session has ended, waiting for admin to tally votes</p><p> You want to retrieve your friend's vote ? </p><input className='input' type='text' placeholder='type the address here, you spy' id='someAddress' /><button className='button-submit' onClick={getVote}>Show it</button><p>{votedFor}</p></>)}
 
         {user && workflow === 5 && (displayWinner ? <h3>Winning proposal is {winningProp} !</h3> : <><p>Drumrolls... 🥁</p><button className='button-user' onClick={getWinningProp}>Reveal the winning proposal</button></>)}
 
-        
-
-        
-        </>
+        </>)}
     </div>
    
   </>

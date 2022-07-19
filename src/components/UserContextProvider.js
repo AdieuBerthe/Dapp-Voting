@@ -90,7 +90,6 @@ const UserContextProvider = ({ children }) => {
   useEffect(() => {
     (async function () {
       if (voting) {
-
         setWinning(await voting.winningProposalID());
       }
     })();
