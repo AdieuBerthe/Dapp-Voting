@@ -5,12 +5,12 @@ import './styles/UserDashboard.css';
 function UserDashboard() {
   const {
     user, voting, workflow, currentStatus, propsArray, setPropsArray, display, setDisplay, id, setId, setVotersWhoVoted, votersWhoVoted, winningProp, winningId, setWinningProp, displayWinner, setDisplayWinner, votedFor, setVotedFor, admin, isUserRegistered
-  } = useContext(UserContext);  
+  } = useContext(UserContext);
 
-   const [disabled, setDisabled] = useState(false);
-   
-  
-   useEffect(() => {
+  const [disabled, setDisabled] = useState(false);
+
+
+  useEffect(() => {
     (async function () {
       if (voting) {
         setDisabled(false);
@@ -19,7 +19,7 @@ function UserDashboard() {
           let voterAddress = listVotersWhoVoted[i].args[0];
           setVotersWhoVoted((Array) => [...Array, ...[voterAddress]]);
         }
-        if(votersWhoVoted.includes(user)) {
+        if (votersWhoVoted.includes(user)) {
           setDisabled(true);
         }
       }
@@ -28,7 +28,7 @@ function UserDashboard() {
   }, [voting, workflow]);
 
 
-  
+
   async function handleProposal() {
     if (voting) {
       try {
@@ -61,9 +61,9 @@ function UserDashboard() {
     if (address.length === 42) {
       try {
         let Voter = await voting.getVoter(address);
-          if (Voter[1]) {
-            let prop = await voting.getOneProposal(Voter[2]);
-            setVotedFor(prop[0]);
+        if (Voter[1]) {
+          let prop = await voting.getOneProposal(Voter[2]);
+          setVotedFor(prop[0]);
         } else {
           alert("This one didn't vote or wasn't registered at all ! :(");
         }
@@ -71,7 +71,7 @@ function UserDashboard() {
       catch (e) {
         console.error(e);
       }
-    } else { 
+    } else {
       alert("This doesn't match an address length");
     };
   }
@@ -79,14 +79,14 @@ function UserDashboard() {
   async function getWinningProp() {
     if (voting) {
       try {
-        if(!displayWinner) {
-        setWinningProp('');
-        let prop = await voting.getOneProposal(winningId);
-        
-        let propdesc = prop.description;
-        setWinningProp(propdesc);
-        showWinner();
-        } 
+        if (!displayWinner) {
+          setWinningProp('');
+          let prop = await voting.getOneProposal(winningId);
+
+          let propdesc = prop.description;
+          setWinningProp(propdesc);
+          showWinner();
+        }
       } catch (e) {
         console.error(e);
       }
@@ -98,15 +98,15 @@ function UserDashboard() {
   }
 
   const handleClick = () => {
-      setPropsArray([]);
+    setPropsArray([]);
     if (!display) {
       showProposal();
       setDisplay(true);
     } else {
       setDisplay(false);
-     }
+    }
   };
- 
+
 
   const handleChange = (event) => {
     setId(event.target.value);
@@ -125,7 +125,7 @@ function UserDashboard() {
       setDisplay(false);
       voting.on("Voted", (address) => {
         setDisabled(true);
-        });
+      });
     }
   }
 
@@ -134,78 +134,78 @@ function UserDashboard() {
   return (
 
 
-<>
-    <div className='global-user'>
-    {!user && (<><p>Metamask isn't connected</p></>)}
-    <div className='element'><p>Connected account :<br /> {user}</p><p>Current status : {currentStatus[workflow]}</p></div>
-      <h1>Voting Dapp</h1>
+    <>
+      <div className='global-user'>
+        {!user && (<><p>Metamask isn't connected</p></>)}
+        <div className='element'><p>Connected account :<br /> {user}</p><p>Current status : {currentStatus[workflow]}</p></div>
+        <h1>Voting Dapp</h1>
 
-    {!isUserRegistered && user === admin && (<h3>Don't forget to register your own address</h3>)}
-    {!isUserRegistered && user !== admin && (<p>Sorry you're not registered</p>)}
-    {isUserRegistered && (
-      <>
+        {!isUserRegistered && user === admin && (<h3>Don't forget to register your own address</h3>)}
+        {!isUserRegistered && user !== admin && (<p>Sorry you're not registered</p>)}
+        {isUserRegistered && (
+          <>
 
-        {user && workflow === 0 && (<>
-          <p>Proposals submission haven't started yet</p>
-        </>
-        )}
-        
-        {user && workflow === 1 && (
-        <div className='up'>
-          <h3>Tell us in your own words, what would be best !</h3><input className='input' type='text' placeholder='Your brilliant idea goes here' id='someoneSaid' /><button className='button-submit' onClick={handleProposal}>Submit!</button>
-        </div>)}
-        
+            {user && workflow === 0 && (<>
+              <p>Proposals submission haven't started yet</p>
+            </>
+            )}
 
-        {user && workflow === 2 && (<>
-          <p>Proposals submission is now closed, waiting for admin to start voting session</p>
-        </>
-        )}
+            {user && workflow === 1 && (
+              <div className='up'>
+                <h3>Tell us in your own words, what would be best !</h3><input className='input' type='text' placeholder='Your brilliant idea goes here' id='someoneSaid' /><button className='button-submit' onClick={handleProposal}>Submit!</button>
+              </div>)}
 
-          {user && workflow < 3 && workflow >= 1 && (<><br/>{!display ? <button className='button-user' onClick={handleClick}>Show Proposals</button> : <button className='button-user' onClick={handleClick}>Hide Proposals</button>}</>)}
 
-          {display && workflow < 3 ?
-            <div><table className='right'>
-              <thead>
-                <tr>
-                  <th>Submitted proposals</th>
-                </tr>
-              </thead>
-              <tbody>
-                {propsArray.map((prop) => (
-                  <tr key={prop[0]}>
-                    <td key={prop[1]}>{prop[0][1]}</td>
+            {user && workflow === 2 && (<>
+              <p>Proposals submission is now closed, waiting for admin to start voting session</p>
+            </>
+            )}
+
+            {user && workflow < 3 && workflow >= 1 && (<><br />{!display ? <button className='button-user' onClick={handleClick}>Show Proposals</button> : <button className='button-user' onClick={handleClick}>Hide Proposals</button>}</>)}
+
+            {display && workflow < 3 ?
+              <div><table className='right'>
+                <thead>
+                  <tr>
+                    <th>Submitted proposals</th>
                   </tr>
-                ))}
-              </tbody>
-            </table></div> : <></>}
+                </thead>
+                <tbody>
+                  {propsArray.map((prop) => (
+                    <tr key={prop[0]}>
+                      <td key={prop[1]}>{prop[0][1]}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table></div> : <></>}
 
-        {user && workflow === 3 && (<>
-          <h3>Time to Vote !</h3>
+            {user && workflow === 3 && (<>
+              <h3>Time to Vote !</h3>
 
-             {disabled ? <p>Thank you for your vote !</p> : 
-          
-            <form onSubmit={handleSubmit}>
-              <select className='input' value={id} onChange={handleChange}>
-                <option value="">Select a Proposal</option>
-                {propsArray.map((prop) => {
-                  return (
-                    <option key={prop[0]} value={prop[0][0]}> {prop[0][1]} </option>
-                  )
-                })}
-              </select>
-              <input className='button-submit' disabled={disabled} type="submit" value="Confirm" />
-            </form>
+              {disabled ? <p>Thank you for your vote !</p> :
+
+                <form onSubmit={handleSubmit}>
+                  <select className='input' value={id} onChange={handleChange}>
+                    <option value="">Select a Proposal</option>
+                    {propsArray.map((prop) => {
+                      return (
+                        <option key={prop[0]} value={prop[0][0]}> {prop[0][1]} </option>
+                      )
+                    })}
+                  </select>
+                  <input className='button-submit' disabled={disabled} type="submit" value="Confirm" />
+                </form>
               }
-        </>)}
+            </>)}
 
-        {user && workflow === 4 && (<><p>Voting session has ended, waiting for admin to tally votes</p><p> You want to retrieve your friend's vote ? </p><input className='input' type='text' placeholder='type the address here, you spy' id='someAddress' /><button className='button-submit' onClick={getVote}>Show it</button><p>{votedFor}</p></>)}
+            {user && workflow === 4 && (<><p>Voting session has ended, waiting for admin to tally votes</p><p> You want to retrieve your friend's vote ? </p><input className='input' type='text' placeholder='type the address here, you spy' id='someAddress' /><button className='button-submit' onClick={getVote}>Show it</button><p>{votedFor}</p></>)}
 
-        {user && workflow === 5 && (displayWinner ? <h3>Winning proposal is {winningProp} !</h3> : <><p>Drumrolls... 🥁</p><button className='button-user' onClick={getWinningProp}>Reveal the winning proposal</button></>)}
+            {user && workflow === 5 && (displayWinner ? <h3>Winning proposal is {winningProp} !</h3> : <><p>Drumrolls... 🥁</p><button className='button-user' onClick={getWinningProp}>Reveal the winning proposal</button></>)}
 
-        </>)}
-    </div>
-   
-  </>
+          </>)}
+      </div>
+
+    </>
   );
 }
 
