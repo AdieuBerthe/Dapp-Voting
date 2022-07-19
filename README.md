@@ -17,7 +17,7 @@ On déploie notre smart contract, par défaut sur ganache, mais on peut précise
 
 ## Elements attendus
 
-- Vidéo de présentation : https://youtu.be/vIjT7ZQaE74
+- Vidéo de présentation : https://youtu.be/iARLQ7RSh7w
 - Lien Github Pages : https://AdieuBerthe.github.io/Dapp-Voting/
 - Addresse du contrat sur Ropsten : [0xFBc2839C529044AcFB5359bA0b4131378278B2DD](https://ropsten.etherscan.io/address/0xFBc2839C529044AcFB5359bA0b4131378278B2DD)
 
