@@ -4,16 +4,16 @@ import './styles/UserDashboard.css';
 
 function UserDashboard() {
   const {
-    user, voting, workflow, currentStatus, propsArray, setPropsArray, display, setDisplay, id, setId, setVotersWhoVoted, votersWhoVoted, winningProp, winningId, setWinningProp, displayWinner, setDisplayWinner, votedFor, setVotedFor, admin
+    user, voting, workflow, currentStatus, propsArray, setPropsArray, display, setDisplay, id, setId, setVotersWhoVoted, votersWhoVoted, winningProp, winningId, setWinningProp, displayWinner, setDisplayWinner, votedFor, setVotedFor, admin, isUserRegistered
   } = useContext(UserContext);  
 
    const [disabled, setDisabled] = useState(false);
-   const [isUserRegistered, setUserRegistered] = useState(false);
-
+   
   
    useEffect(() => {
     (async function () {
       if (voting) {
+        setDisabled(false);
         let listVotersWhoVoted = await voting.queryFilter(voting.filters.Voted());
         for (let i = 0; i < listVotersWhoVoted.length; i++) {
           let voterAddress = listVotersWhoVoted[i].args[0];
@@ -27,21 +27,8 @@ function UserDashboard() {
     // eslint-disable-next-line
   }, [voting, workflow]);
 
-  useEffect(() => {
-    (async function () {
-      if (voting) {
-        let userRegistered = await voting.getVoter(user);
-        if(userRegistered[1]) {
-          setUserRegistered(true);
-        }
-      }
-    })();
-    // eslint-disable-next-line
-  }, [voting, workflow, user]);
 
   
-
-
   async function handleProposal() {
     if (voting) {
       try {

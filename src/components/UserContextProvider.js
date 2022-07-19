@@ -17,6 +17,7 @@ const UserContext = createContext();
 const UserContextProvider = ({ children }) => {
     const [admin, setAdmin] = useState();;
   const [user, setUser] = useState();
+  const [isUserRegistered, setUserRegistered] = useState(false);
   const [chainId, setChainId] = useState();
   const [listVoters, setVotersList] = useState([]);
   const [propsArray, setPropsArray] = useState([]);
@@ -47,12 +48,13 @@ const UserContextProvider = ({ children }) => {
 
       window.ethereum.on('accountsChanged', (accounts) => {
         setUser(getAddress(accounts[0]));
-      });
+        });
 
       window.ethereum.on('chainChanged', (newChainId) => {
         setChainId(newChainId);
       });
     })();
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
@@ -70,6 +72,7 @@ const UserContextProvider = ({ children }) => {
   }, [provider]);
 
 
+  
 
   useEffect(() => {
     (async function () {
@@ -116,6 +119,21 @@ const UserContextProvider = ({ children }) => {
   useEffect(() => {
     (async function () {
       if (voting) {
+        setUserRegistered(false);
+        let userRegistered = await voting.getVoter(user);
+        if(userRegistered[0]) {
+          setUserRegistered(true);
+        }
+      }
+    })();
+    // eslint-disable-next-line
+  }, [user, voting, workflow]);
+
+
+
+  useEffect(() => {
+    (async function () {
+      if (voting) {
         let winningId = await voting.winningProposalID();
         setWinning(BigNumber.from(winningId).toNumber());
       }
@@ -153,6 +171,7 @@ const UserContextProvider = ({ children }) => {
             setDisplayWinner,
             votedFor,
             setVotedFor,
+            isUserRegistered
             }}>
           {children}
         </UserContext.Provider>
