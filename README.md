@@ -23,3 +23,4 @@ On déploie notre smart contract, par défaut sur ganache, mais on peut précise
 
 ---
 
+On peut faire un transfert d'ownership pour la tester au besoin 🤘
