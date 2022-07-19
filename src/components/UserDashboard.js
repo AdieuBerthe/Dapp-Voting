@@ -1,11 +1,30 @@
-import { useContext } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { UserContext } from "./UserContextProvider";
 import './styles/UserDashboard.css';
 
 function UserDashboard() {
   const {
-    user, voting, workflow, currentStatus, propsArray, setPropsArray, display, setDisplay, id, setId, setVotersWhoVoted, votersWhoVoted, winningProp, winningId, setWinningProp, displayWinner, setDisplayWinner, votedFor, setVotedFor
-  } = useContext(UserContext);
+    user, voting, workflow, currentStatus, propsArray, setPropsArray, display, setDisplay, id, setId, setVotersWhoVoted, votersWhoVoted, winningProp, winningId, setWinningProp, displayWinner, setDisplayWinner, votedFor, setVotedFor, 
+  } = useContext(UserContext);  
+
+   const [disabled, setDisabled] = useState(false);
+
+  
+   useEffect(() => {
+    (async function () {
+      if (voting) {
+        let listVotersWhoVoted = await voting.queryFilter(voting.filters.Voted());
+        for (let i = 0; i < listVotersWhoVoted.length; i++) {
+          let voterAddress = listVotersWhoVoted[i].args[0];
+          setVotersWhoVoted((Array) => [...Array, ...[voterAddress]]);
+        }
+        if(votersWhoVoted.includes(user)) {
+          setDisabled(true);
+        }
+      }
+    })();
+    // eslint-disable-next-line
+  }, [voting, workflow]);
 
 
   async function handleProposal() {
@@ -18,14 +37,9 @@ function UserDashboard() {
     }
   }
 
-
-
-
-
   async function showProposal() {
     if (voting) {
       try {
-
         let listProposals = await voting.queryFilter(voting.filters.ProposalRegistered());
         for (let i = 0; i < listProposals.length; i++) {
           let prop = await voting.getOneProposal(i);
@@ -38,20 +52,7 @@ function UserDashboard() {
     }
   }
 
-  async function checkHasVoted() {
-    if (voting) {
-      try {
-        let listVotersWhoVoted = await voting.queryFilter(voting.filters.Voted());
-        for (let i = 0; i < listVotersWhoVoted.length; i++) {
-          let voterAddress = listVotersWhoVoted[i].args[0];
-          setVotersWhoVoted((Array) => [...Array, ...[voterAddress]]);
-        }
-      }
-      catch (e) {
-        console.error(e);
-      }
-    }
-  }
+
 
   async function getVote() {
     let address = document.getElementById('someAddress').value;
@@ -97,7 +98,6 @@ function UserDashboard() {
   const handleClick = () => {
       setPropsArray([]);
     if (!display) {
-      checkHasVoted();
       showProposal();
       setDisplay(true);
     } else {
@@ -122,8 +122,8 @@ function UserDashboard() {
       console.log(tx);
       setDisplay(false);
       voting.on("Voted", (address) => {
-        alert(`${address} : Your vote has been registered)`)
-      });
+        setDisabled(true);
+        });
     }
   }
 
@@ -134,24 +134,12 @@ function UserDashboard() {
 
 <>
     <div className='global-user'>
+    {!user && (<><p>Metamask isn't connected</p></>)}
+    <div className='element'><p>Connected account :<br /> {user}</p><p>Current status : {currentStatus[workflow]}</p></div>
       <h1>Voting Dapp</h1>
-      {!user && (<><p>Metamask isn't connected</p></>)}
-      <div className='element'><p>Connected account :<br /> {user}</p><p>Current status : {currentStatus[workflow]}</p></div>
-      {display && workflow < 3 ?
-          <div><table className='right'>
-            <thead>
-              <tr>
-                <th>Submitted proposals</th>
-              </tr>
-            </thead>
-            <tbody>
-              {propsArray.map((prop) => (
-                <tr key={prop[0]}>
-                  <td key={prop[1]}>{prop[0][1]}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table></div> : <></>}
+     
+      
+      
           
       <>
 
@@ -167,14 +155,36 @@ function UserDashboard() {
         <div className='up'>
           <h3>Tell us in your own words, what would be best !</h3><input className='input' type='text' placeholder='Your brilliant idea goes here' id='someoneSaid' /><button className='button-submit' onClick={handleProposal}>Submit!</button>
         </div>)}
+        
+
         {user && workflow === 2 && (<>
           <p>Proposals submission is now closed, waiting for admin to start voting session</p>
         </>
         )}
 
+{user && workflow < 3 && workflow >= 1 && (<><br/>{!display ? <button className='button-user' onClick={handleClick}>Show Proposals</button> : <button className='button-user' onClick={handleClick}>Hide Proposals</button>}</>)}
+
+          {display && workflow < 3 ?
+            <div><table className='right'>
+              <thead>
+                <tr>
+                  <th>Submitted proposals</th>
+                </tr>
+              </thead>
+              <tbody>
+                {propsArray.map((prop) => (
+                  <tr key={prop[0]}>
+                    <td key={prop[1]}>{prop[0][1]}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table></div> : <></>}
+
         {user && workflow === 3 && (<>
           <h3>Time to Vote !</h3>
-          {!display ? <button className='button-user' onClick={handleClick}>I'm ready to vote !</button> :
+
+             {disabled ? <p>Thank you for your vote !</p> : 
+          
             <form onSubmit={handleSubmit}>
               <select className='input' value={id} onChange={handleChange}>
                 <option value="">Select a Proposal</option>
@@ -184,16 +194,18 @@ function UserDashboard() {
                   )
                 })}
               </select>
-              <input className='button-submit' type="submit" value="Confirm" />
+              <input className='button-submit' disabled={disabled} type="submit" value="Confirm" />
             </form>
-          }
+}
         </>)}
 
         {user && workflow === 4 && (<><p>Voting session has ended, waiting for admin to tally votes</p><p> You want to retrieve your friend's vote ? </p><input className='input' type='text' placeholder='type the address here, you spy' id='someAddress' /><button className='button-submit' onClick={getVote}>Show it</button><p>{votedFor}</p></>)}
 
-        {user && workflow === 5 && (displayWinner ? <h3>Winning proposal is {winningProp}</h3> : <button className='button-user' onClick={getWinningProp}>Reveal the winning proposal</button>)}
+        {user && workflow === 5 && (displayWinner ? <h3>Winning proposal is {winningProp} !</h3> : <><p>Drumrolls... 🥁</p><button className='button-user' onClick={getWinningProp}>Reveal the winning proposal</button></>)}
 
-        {user && workflow < 3 && workflow >= 1 && (<><br/>{!display ? <button className='button-user' onClick={handleClick}>Show Proposals</button> : <button className='button-user' onClick={handleClick}>Hide Proposals</button>}</>)}
+        
+
+        
         </>
     </div>
    

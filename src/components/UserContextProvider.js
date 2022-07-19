@@ -69,9 +69,28 @@ const UserContextProvider = ({ children }) => {
     })();
   }, [provider]);
 
+
+
   useEffect(() => {
     (async function () {
       if (voting) {
+      if (workflow === 3) {
+        let listProposals = await voting.queryFilter(voting.filters.ProposalRegistered());
+        for (let i = 0; i < listProposals.length; i++) {
+          let prop = await voting.getOneProposal(i);
+          let propdesc = prop.description;
+          setPropsArray((propsArray) => [...propsArray, [[i, propdesc]]]);
+        }
+      }
+    }
+    })();
+    // eslint-disable-next-line
+    }, [workflow]);
+
+  useEffect(() => {
+    (async function () {
+      if (voting) {
+
         setWinning(await voting.winningProposalID());
       }
     })();
@@ -82,7 +101,6 @@ const UserContextProvider = ({ children }) => {
     (async function () {
       if (voting) {
         setAdmin(getAddress(await voting.owner()));
-
       }
     })();
   }, [voting]);
@@ -91,7 +109,6 @@ const UserContextProvider = ({ children }) => {
     (async function () {
       if (voting) {
         let i = await voting.workflowStatus();
-
         setWorkflow(BigNumber.from(i).toNumber());
       }
     })();
@@ -105,6 +122,9 @@ const UserContextProvider = ({ children }) => {
       }
     })();
   }, [voting]);
+
+  
+
 
     return (
         <UserContext.Provider value={{
@@ -133,7 +153,7 @@ const UserContextProvider = ({ children }) => {
             displayWinner,
             setDisplayWinner,
             votedFor,
-            setVotedFor
+            setVotedFor,
             }}>
           {children}
         </UserContext.Provider>
